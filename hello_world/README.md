@@ -3,13 +3,13 @@
 ## Get Started
 ```shell
 cd hello_world
-docker build -t lad_hello_world .
+docker build -t lad/hello_world .
 ```
 
 ## Run the image
 
 ```shell
- docker -p 7860:7860 run lad_hello_world
+ docker -p 7860:7860 run lad/hello_world
 ```
 
 Open the web page at http://0.0.0.0:7860, if success you can the following response 
