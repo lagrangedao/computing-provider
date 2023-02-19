@@ -4,29 +4,21 @@ using the docker module.
 
 Before starting, you will need a `.env` file with the following:
 
-::
-
-    OUR_DOCKER_USERNAME=Unknown
-    OUR_DOCKER_PASSWORD=Unknown
-    OUR_DOCKER_EMAIL=Unknown
+OUR_DOCKER_USERNAME=Unknown
+OUR_DOCKER_PASSWORD=Unknown
+OUR_DOCKER_EMAIL=Unknown
 
 Author:
-    - @funilrys
+    - @claydrone
 """
-import json
-import logging
 import os
 import json
 import logging
 import re
-
-import docker
 import docker
 from dotenv import load_dotenv
 
 DOCKER_API_CLIENT = docker.APIClient(base_url="unix://var/run/docker.sock")
-
-REGISTRY = "docker.io"
 
 # Let's load the `.env` file.
 load_dotenv(".env")
@@ -39,32 +31,33 @@ class StreamLineBuildGenerator(object):
         self.__dict__ = json.loads(json_data)
 
 
-class Docker(object):
-    REGISTRY = "docker.io"
+def get_credentials_from_env() -> dict:
+    """
+    Try to get the credentials from the environment variables.
 
-    def __init__(self):
+    :return:
+        {
+            "username": str,
+            "password": str,
+            "email": str
+        }
+    """
+
+    var2env: dict = {
+        "username": "OUR_DOCKER_USERNAME",
+        "password": "OUR_DOCKER_PASSWORD",
+        "email": "OUR_DOCKER_EMAIL",
+    }
+
+    return {k: os.getenv(v, None) for k, v in var2env.items()}
+
+
+class Docker(object):
+
+    def __init__(self, registry):
         self.client = docker.from_env()
         self.api_client = docker.APIClient(base_url="unix://var/run/docker.sock")
-
-    def get_credentials_from_env(self) -> dict:
-        """
-        Try to get the credentials from the environment variables.
-
-        :return:
-            {
-                "username": str,
-                "password": str,
-                "email": str
-            }
-        """
-
-        var2env: dict = {
-            "username": "OUR_DOCKER_USERNAME",
-            "password": "OUR_DOCKER_PASSWORD",
-            "email": "OUR_DOCKER_EMAIL",
-        }
-
-        return {k: os.getenv(v, None) for k, v in var2env.items()}
+        self.registry = registry
 
     def log_response(self, response: dict) -> None:
         """
@@ -107,18 +100,18 @@ class Docker(object):
 
     def build(self, path, repository):
 
-        tag = "{}/{}".format(Docker.REGISTRY, repository)
+        tag = "{}/{}".format(self.registry, repository)
 
         output = self.api_client.build(path=path, tag=tag)
         self._process_output(output)
         log.info("done building {}".format(repository))
 
     def push(self, repository):
-        tag = "{}/{}".format(Docker.REGISTRY, repository)
+        tag = "{}/{}".format(self.registry, repository)
         print(tag)
         publisher = self.api_client.push(repository=repository,
                                          stream=True,
-                                         decode=True, auth_config=self.get_credentials_from_env()
+                                         decode=True, auth_config=get_credentials_from_env()
                                          )
         for response in publisher:
             self.log_response(response)
@@ -184,6 +177,7 @@ if __name__ == "__main__":
     IMAGE_TAG_NAME = "nbaicloud/hello_world"
     IMAGE_PATH = './hello_world'
     repository = 'nbaicloud/hello_world'
-    docker_client = Docker()
+    registry = 'docker.io'
+    docker_client = Docker(registry)
     docker_client.build(path=IMAGE_PATH, repository=repository)
     docker_client.push(repository)
