@@ -16,8 +16,11 @@ Author:
 import json
 import logging
 import os
+import json
+import logging
+import re
 
-import click
+import docker
 import docker
 from dotenv import load_dotenv
 
@@ -28,98 +31,6 @@ REGISTRY = "docker.io"
 # Let's load the `.env` file.
 load_dotenv(".env")
 
-
-def log_response(response: dict) -> None:
-    """
-    Given a response from the Docker client.
-    We log it.
-
-    :raise Exception:
-        When an error is caught.
-    """
-
-    if "stream" in response:
-        for line in response["stream"].splitlines():
-            if line:
-                logging.info(line)
-
-    if "progressDetail" in response and "status" in response:
-        if "id" in response and response["progressDetail"]:
-            percentage = round(
-                (response["progressDetail"]["current"] * 100)
-                / response["progressDetail"]["total"],
-                2,
-            )
-
-            logging.info(
-                "%s (%s): %s/%s (%s%%)",
-                response["status"],
-                response["id"],
-                response["progressDetail"]["current"],
-                response["progressDetail"]["total"],
-                percentage,
-            )
-        elif "id" in response:
-            logging.info("%s (%s)", response["status"], response["id"])
-        else:
-            logging.info("%s", response["status"])
-    elif "errorDetail" in response and response["errorDetail"]:
-        raise Exception(response["errorDetail"]["message"])
-    elif "status" in response:
-        logging.info("%s", response["status"])
-
-
-def get_credentials_from_env() -> dict:
-    """
-    Try to get the credentials from the environment variables.
-
-    :return:
-        {
-            "username": str,
-            "password": str,
-            "email": str
-        }
-    """
-
-    var2env: dict = {
-        "username": "OUR_DOCKER_USERNAME",
-        "password": "OUR_DOCKER_PASSWORD",
-        "email": "OUR_DOCKER_EMAIL",
-    }
-
-    return {k: os.getenv(v, None) for k, v in var2env.items()}
-
-
-def push_images(images: list, creds: dict) -> None:
-    """
-    Given credentials and a list of images to push, push the
-    image to the declared registry.
-
-    :param creds:
-        The credentials to use.
-
-    :param images:
-        A list of images to push.
-    """
-
-    for image in images:
-        for tag in image["RepoTags"]:
-            publisher = DOCKER_API_CLIENT.push(
-                repository=f"{REGISTRY}/{tag}",
-                stream=True,
-                decode=True,
-                auth_config=creds,
-            )
-
-            for response in publisher:
-                log_response(response)
-
-import json
-import logging
-import re
-
-import docker
-
 log = logging.getLogger(__name__)
 
 
@@ -129,22 +40,88 @@ class StreamLineBuildGenerator(object):
 
 
 class Docker(object):
-    REGISTRY = "some_docker_registry"
+    REGISTRY = "docker.io"
 
     def __init__(self):
         self.client = docker.from_env()
-        self.api_client = docker.APIClient()
+        self.api_client = docker.APIClient(base_url="unix://var/run/docker.sock")
+
+    def get_credentials_from_env(self) -> dict:
+        """
+        Try to get the credentials from the environment variables.
+
+        :return:
+            {
+                "username": str,
+                "password": str,
+                "email": str
+            }
+        """
+
+        var2env: dict = {
+            "username": "OUR_DOCKER_USERNAME",
+            "password": "OUR_DOCKER_PASSWORD",
+            "email": "OUR_DOCKER_EMAIL",
+        }
+
+        return {k: os.getenv(v, None) for k, v in var2env.items()}
+
+    def log_response(self, response: dict) -> None:
+        """
+        Given a response from the Docker client.
+        We log it.
+
+        :raise Exception:
+            When an error is caught.
+        """
+
+        if "stream" in response:
+            for line in response["stream"].splitlines():
+                if line:
+                    logging.info(line)
+
+        if "progressDetail" in response and "status" in response:
+            if "id" in response and response["progressDetail"]:
+                percentage = round(
+                    (response["progressDetail"]["current"] * 100)
+                    / response["progressDetail"]["total"],
+                    2,
+                )
+
+                logging.info(
+                    "%s (%s): %s/%s (%s%%)",
+                    response["status"],
+                    response["id"],
+                    response["progressDetail"]["current"],
+                    response["progressDetail"]["total"],
+                    percentage,
+                )
+            elif "id" in response:
+                logging.info("%s (%s)", response["status"], response["id"])
+            else:
+                logging.info("%s", response["status"])
+        elif "errorDetail" in response and response["errorDetail"]:
+            raise Exception(response["errorDetail"]["message"])
+        elif "status" in response:
+            logging.info("%s", response["status"])
 
     def build(self, path, repository):
+
         tag = "{}/{}".format(Docker.REGISTRY, repository)
+
         output = self.api_client.build(path=path, tag=tag)
         self._process_output(output)
         log.info("done building {}".format(repository))
 
     def push(self, repository):
         tag = "{}/{}".format(Docker.REGISTRY, repository)
-        output = self.client.images.push(tag)
-        self._process_output(output)
+        print(tag)
+        publisher = self.api_client.push(repository=repository,
+                                         stream=True,
+                                         decode=True, auth_config=self.get_credentials_from_env()
+                                         )
+        for response in publisher:
+            self.log_response(response)
         log.info("done pushing {}".format(tag))
 
     def _process_output(self, output):
@@ -195,18 +172,9 @@ class Docker(object):
                     message = "problem executing Docker: {}".format(". ".join(errors))
                     raise SystemError(message)
 
+
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    credentials = get_credentials_from_env()
-
-    login = DOCKER_API_CLIENT.login(
-        credentials["username"],
-        password=credentials["password"],
-        email=credentials["password"],
-        registry=REGISTRY,
-        reauth=True,
-    )
 
     client = docker.from_env()
     # for image in client.images.list():
@@ -215,26 +183,7 @@ if __name__ == "__main__":
     # It should be formatted like `user/repository` as per Docker Hub!!
     IMAGE_TAG_NAME = "nbaicloud/hello_world"
     IMAGE_PATH = './hello_world'
-    image, build_logs = client.images.build(path=IMAGE_PATH,tag=IMAGE_TAG_NAME, quiet=False)
-    print(image.id)
-    #
-    # # Print the build logs to the console
-    # for line in build_logs:
-    #     print(line)
-
-    # Print the ID of the built image
-    # print("Image ID:", image.id)
-    generator = DOCKER_API_CLIENT.build(IMAGE_PATH, tag=IMAGE_TAG_NAME, rm=True)
-    while True:
-        try:
-            output = generator.__next__
-            output = output.strip('\r\n')
-            json_output = json.loads(output)
-            if 'stream' in json_output:
-                click.echo(json_output['stream'].strip('\n'))
-        except StopIteration:
-            click.echo("Docker image build complete.")
-            break
-        except ValueError:
-            click.echo("Error parsing output from docker image build: %s" % output)
-    push_images(DOCKER_API_CLIENT.images(name=IMAGE_TAG_NAME), credentials)
+    repository = 'nbaicloud/hello_world'
+    docker_client = Docker()
+    docker_client.build(path=IMAGE_PATH, repository=repository)
+    docker_client.push(repository)
