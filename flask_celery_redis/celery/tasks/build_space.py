@@ -1,0 +1,37 @@
+import logging
+
+from celery import states
+from celery.exceptions import Ignore
+import requests
+
+from flask_celery_redis.celery.celery_app import celery_app
+
+
+logger = logging.getLogger(__name__)
+DOCKER_BUILD_SPACE_TASK = "build_space_task"
+
+
+@celery_app.task(name=DOCKER_BUILD_SPACE_TASK, bind=True)
+def build_space_task(self, space_name):
+    logger.info(
+        f"Attempting to download space from Lagrange. space name:{space_name}"
+    )
+    space_api_response = requests.get(f"http://18.221.71.211:5000/spaces/{space_name}")
+    logger.info(f"Space API response received. Response: {space_api_response.status_code}")
+
+    if not space_api_response.ok:
+        logger.warning(f"Updating Celery task to FAILED state!")
+
+        self.update_state(
+            state=states.FAILURE,
+            meta=f"Space API response not OK. Status Code: {space_api_response.status_code}",
+        )
+
+        raise Exception("Space not found!")
+
+    space_json = space_api_response.json()
+    files = space_json['data']['files']
+
+    for file in files:
+        with open(f"flask_celery_redis/static/pokemon/{file['name']}", "wb") as f:
+            f.write(requests.get(file['url']).content)

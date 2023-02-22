@@ -1,18 +1,46 @@
-#### Flask and Asynchronous Tasks with Celery and Redis
+#### Lagrange Asynchronous Tasks  Pipeline
 
-This is the Dockerized Flask application project for my [Flask and Asynchronous Tasks with Celery and Redis](https://ericbernier.com/flask-celery-redis) blog post. This post assumes you have [Docker](https://docs.docker.com/engine/install/) installed. Please read the post for further details.
+As a pipeline, the states are changing according to the build needs.
+
+Standard build process:
+
+* Webhook trigger
+* Task creation
+    * Task details from CID
+    * Download the Space
+    * Make build
+    * Push to the remote docker hub
+    * Clean up
+        * build file
+        * local cache
+        * images
+
+Manual started
+
+```shell
+gunicorn -c "python:config.gunicorn" --reload "flask_celery_redis.app:create_app()"
+```
+
+Start a worker
+
+```shell
+celery --app flask_celery_redis.celery.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
+```
 
 Build all services:
+
 ```bash
 docker-compose build
 ```
 
 Start all serivces:
+
 ```bash
 docker-compose up
 ```
 
 Stop all serivces:
+
 ```bash
 docker-compose stop
 ```
