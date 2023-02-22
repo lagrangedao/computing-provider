@@ -1,4 +1,4 @@
-# read the doc: https://docs.lagrangedao.org/lagrange-dao/getstarted/spaces/docker-spaces
+# read the docs: https://docs.lagrangedao.org/lagrange-dao/getstarted/spaces/docker-spaces
 # you will also find guides on how best to write your Dockerfile
 
 FROM python:3.9
