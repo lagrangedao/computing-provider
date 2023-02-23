@@ -18,10 +18,8 @@ import re
 import docker
 from dotenv import load_dotenv
 
-DOCKER_API_CLIENT = docker.APIClient(base_url="unix://var/run/docker.sock")
-
 # Let's load the `.env` file.
-load_dotenv(".env")
+
 
 log = logging.getLogger(__name__)
 
@@ -31,33 +29,32 @@ class StreamLineBuildGenerator(object):
         self.__dict__ = json.loads(json_data)
 
 
-def get_credentials_from_env() -> dict:
-    """
-    Try to get the credentials from the environment variables.
-
-    :return:
-        {
-            "username": str,
-            "password": str,
-            "email": str
-        }
-    """
-
-    var2env: dict = {
-        "username": "OUR_DOCKER_USERNAME",
-        "password": "OUR_DOCKER_PASSWORD",
-        "email": "OUR_DOCKER_EMAIL",
-    }
-
-    return {k: os.getenv(v, None) for k, v in var2env.items()}
-
-
 class Docker(object):
 
-    def __init__(self, registry):
-        self.client = docker.from_env()
+    def __init__(self, registry_url):
+        load_dotenv(".env")
+        # self.client = docker.from_env()
         self.api_client = docker.APIClient(base_url="unix://var/run/docker.sock")
-        self.registry = registry
+        self.registry = registry_url
+        print(self.get_credentials_from_env())
+
+    def get_credentials_from_env(self) -> dict:
+        """
+        Try to get the credentials from the environment variables.
+        :return:
+            {
+                "username": str,
+                "password": str,
+                "email": str
+            }
+        """
+        var2env: dict = {
+            "username": "OUR_DOCKER_USERNAME",
+            "password": "OUR_DOCKER_PASSWORD",
+            "email": "OUR_DOCKER_EMAIL",
+        }
+
+        return {k: os.getenv(v, None) for k, v in var2env.items()}
 
     def log_response(self, response: dict) -> None:
         """
@@ -111,8 +108,9 @@ class Docker(object):
         print(tag)
         publisher = self.api_client.push(repository=repository,
                                          stream=True,
-                                         decode=True, auth_config=get_credentials_from_env()
+                                         decode=True, auth_config=self.get_credentials_from_env()
                                          )
+        print(self.get_credentials_from_env())
         for response in publisher:
             self.log_response(response)
         log.info("done pushing {}".format(tag))
@@ -169,13 +167,13 @@ class Docker(object):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    client = docker.from_env()
+    # client = docker.from_env()
     # for image in client.images.list():
     #     print(image.id)
     # WARNING: We assume that you tagged your images correctly!!!
     # It should be formatted like `user/repository` as per Docker Hub!!
     IMAGE_TAG_NAME = "nbaicloud/hello_world"
-    IMAGE_PATH = './hello_world'
+    IMAGE_PATH = 'flask_celery_redis/static/build/0x96216849c49358B10257cb55b28eA603c874b05E/spaces/hello_world/hello_world'
     repository = 'nbaicloud/hello_world'
     registry = 'docker.io'
     docker_client = Docker(registry)
