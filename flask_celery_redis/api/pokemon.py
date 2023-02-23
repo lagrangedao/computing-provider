@@ -35,6 +35,6 @@ def build_space(task_name):
     :return: Task Id working on sprite retrieval, 202 status code
     """
     task = build_space_task.delay(task_name)
-    logger.info(f"build space task task created! Task ID: {task!r}")
+    logger.info(f"build spaces task task created! Task ID: {task!r}")
 
     return jsonify({"taskId": task.id}), 202
