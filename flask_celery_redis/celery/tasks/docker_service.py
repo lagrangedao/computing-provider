@@ -178,3 +178,10 @@ if __name__ == "__main__":
     docker_client = Docker(registry)
     docker_client.build(path=IMAGE_PATH, repository=repository)
     docker_client.push(repository)
+    container_id = docker_client.api_client.create_container(
+        'busybox', 'ls', ports=[1111, 2222],
+        host_config=docker_client.api_client.create_host_config(port_bindings={
+            1111: 4567,
+            2222: None
+        })
+    )

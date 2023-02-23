@@ -16,6 +16,9 @@ Standard build process:
         * images
 
 Manual started
+```shell
+ docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest 
+```
 
 ```shell
 gunicorn -c "python:config.gunicorn" --reload "flask_celery_redis.app:create_app()"
