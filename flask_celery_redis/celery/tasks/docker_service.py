@@ -36,7 +36,6 @@ class Docker(object):
         # self.client = docker.from_env()
         self.api_client = docker.APIClient(base_url="unix://var/run/docker.sock")
         self.registry = registry_url
-        print(self.get_credentials_from_env())
 
     def get_credentials_from_env(self) -> dict:
         """
