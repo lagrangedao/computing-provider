@@ -58,4 +58,3 @@ def build_space_task(self, space_name):
     else:
         logger.info("Space %s is not found." % space_name)
 
-

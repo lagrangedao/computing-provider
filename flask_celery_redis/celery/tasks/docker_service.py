@@ -109,7 +109,6 @@ class Docker(object):
                                          stream=True,
                                          decode=True, auth_config=self.get_credentials_from_env()
                                          )
-        print(self.get_credentials_from_env())
         for response in publisher:
             self.log_response(response)
         log.info("done pushing {}".format(tag))
