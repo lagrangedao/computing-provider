@@ -52,3 +52,9 @@ docker-compose stop
 ```
 
 Once everything is up and running navigate to `http://127.0.0.1:8000 to test out the application in a browser!
+
+### Create a testing task
+
+```shell
+http://{{publisher_host}}/lagrange/space/hello_world
+```
