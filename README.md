@@ -1,7 +1,7 @@
 #### Lagrange Asynchronous Tasks  Pipeline
 
 As a pipeline, the states are changing according to the build needs.
-
+![img.png](img.png)
 Standard build process:
 
 * Webhook trigger
