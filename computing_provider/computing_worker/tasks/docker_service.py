@@ -171,7 +171,7 @@ if __name__ == "__main__":
     # WARNING: We assume that you tagged your images correctly!!!
     # It should be formatted like `user/repository` as per Docker Hub!!
     IMAGE_TAG_NAME = "nbaicloud/hello_world"
-    IMAGE_PATH = 'flask_celery_redis/static/build/0x96216849c49358B10257cb55b28eA603c874b05E/spaces/hello_world/hello_world'
+    IMAGE_PATH = 'computing_provider/static/build/0x96216849c49358B10257cb55b28eA603c874b05E/spaces/hello_world/hello_world'
     repository = 'nbaicloud/hello_world'
     registry = 'docker.io'
     docker_client = Docker(registry)

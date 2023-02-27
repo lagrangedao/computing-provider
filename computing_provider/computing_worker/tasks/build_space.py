@@ -1,14 +1,10 @@
 import logging
 import os
-import subprocess
 
-import docker
-from celery import states
-from celery.exceptions import Ignore
 import requests
 
-from flask_celery_redis.celery.celery_app import celery_app
-from flask_celery_redis.celery.tasks.docker_service import Docker
+from computing_provider.computing_worker.celery_app import celery_app
+from computing_provider.computing_worker.tasks.docker_service import Docker
 
 logger = logging.getLogger(__name__)
 DOCKER_BUILD_SPACE_TASK = "build_space_task"
@@ -33,7 +29,7 @@ def build_space_task(self, space_name):
 
     space_json = space_api_response.json()
     files = space_json['data']['files']
-    build_folder = 'flask_celery_redis/static/build/'
+    build_folder = 'computing_provider/static/build/'
     if files:
         download_space_path = '/'.join(os.path.dirname(files[0]['name']).split('/')[0:2])
         for file in files:

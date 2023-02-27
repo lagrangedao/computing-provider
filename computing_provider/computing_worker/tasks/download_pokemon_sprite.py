@@ -4,7 +4,7 @@ from celery import states
 from celery.exceptions import Ignore
 import requests
 
-from flask_celery_redis.celery.celery_app import celery_app
+from computing_provider.computing_worker.celery_app import celery_app
 
 
 logger = logging.getLogger(__name__)

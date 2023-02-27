@@ -2,9 +2,9 @@ import logging
 
 from flask import Flask
 
-from flask_celery_redis.api.celery_status import celery_task_status_blueprint
-from flask_celery_redis.api.pokemon import pokemon_blueprint
-from flask_celery_redis.api.views import views_blueprint
+from computing_provider.api.celery_status import celery_task_status_blueprint
+from computing_provider.api.pokemon import pokemon_blueprint
+from computing_provider.api.views import views_blueprint
 
 
 def create_app():

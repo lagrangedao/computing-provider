@@ -15,19 +15,22 @@ Standard build process:
         * local cache
         * images
 
-Manual started
-```shell
- docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest 
-```
+Manual started Redis
 
 ```shell
-gunicorn -c "python:config.gunicorn" --reload "flask_celery_redis.app:create_app()"
+ docker run -d --name computing_provider -p 6379:6379 redis/redis-stack-server:latest 
+```
+
+computing provider
+
+```shell
+gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
 ```
 
 Start a worker
 
 ```shell
-celery --app flask_celery_redis.celery.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
+celery --app computing_provider.computing_worker.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
 ```
 
 Build all services:

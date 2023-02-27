@@ -1,8 +1,6 @@
 import logging
-
-from celery.result import AsyncResult
 from flask import Blueprint, jsonify
-
+from celery.result import AsyncResult
 logger = logging.getLogger(__name__)
 celery_task_status_blueprint = Blueprint("celery_status", __name__)
 

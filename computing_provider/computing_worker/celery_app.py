@@ -3,8 +3,8 @@ import logging
 from celery import Celery
 from kombu import Queue, Exchange
 
-from flask_celery_redis.celery import celeryconfig
-from flask_celery_redis.celery.celeryconfig import DOWNLOAD_POKEMON_SPRITE_QUEUE, BUILD_SPACE_QUEUE
+from computing_provider.computing_worker import celeryconfig
+from computing_provider.computing_worker.celeryconfig import DOWNLOAD_POKEMON_SPRITE_QUEUE, BUILD_SPACE_QUEUE
 
 logging.basicConfig(
     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",

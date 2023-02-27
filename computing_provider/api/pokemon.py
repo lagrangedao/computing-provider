@@ -1,10 +1,10 @@
 import logging
 
-from flask import Blueprint, send_file, jsonify
-from flask_celery_redis.celery.tasks.download_pokemon_sprite import (
+from flask import Blueprint, jsonify
+from computing_provider.computing_worker.tasks.download_pokemon_sprite import (
     download_pokemon_sprite_task,
 )
-from flask_celery_redis.celery.tasks.build_space import (
+from computing_provider.computing_worker.tasks.build_space import (
     build_space_task,
 )
 

@@ -1,5 +1,5 @@
 import pytest
-from flask_celery_redis.app import create_app
+from computing_provider.app import create_app
 
 
 @pytest.fixture

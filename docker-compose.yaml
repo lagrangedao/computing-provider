@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/flask_celery_redis
+      - .:/computing_provider
     command: >
       gunicorn -c "python:config.gunicorn" --reload "flask_celery_redis.app:create_app()"
   celery_worker:
@@ -30,7 +30,7 @@ services:
     platform: linux/amd64
     
     volumes:
-      - .:/flask_celery_redis
+      - .:/computing_provider
     command: >
       celery --app flask_celery_redis.celery.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
 volumes:

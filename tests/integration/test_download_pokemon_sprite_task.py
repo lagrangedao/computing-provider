@@ -1,7 +1,7 @@
 import pytest
 
 
-from flask_celery_redis.celery.tasks.download_pokemon_sprite import (
+from computing_provider.computing_worker.tasks.download_pokemon_sprite import (
     download_pokemon_sprite_task,
 )
 
