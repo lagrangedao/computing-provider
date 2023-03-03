@@ -17,6 +17,7 @@ Standard build process:
 
 Manual started Redis
 
+
 ```shell
  docker run -d --name computing_provider -p 6379:6379 redis/redis-stack-server:latest 
 ```
@@ -24,10 +25,18 @@ Manual started Redis
 computing provider
 
 ```shell
+sudo apt install -y gunicorn
+```
+
+```shell
 gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
 ```
 
 Start a worker
+
+```shell
+sudo apt install -y python-celery-common 
+```
 
 ```shell
 celery --app computing_provider.computing_worker.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
