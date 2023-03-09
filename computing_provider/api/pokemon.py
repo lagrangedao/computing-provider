@@ -6,6 +6,7 @@ from computing_provider.computing_worker.tasks.download_pokemon_sprite import (
 )
 from computing_provider.computing_worker.tasks.build_space import (
     build_space_task,
+    delete_space_task,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,4 +38,14 @@ def build_space(task_name):
     task = build_space_task.delay(task_name)
     logger.info(f"build spaces task task created! Task ID: {task!r}")
 
-    return jsonify({"taskId": task.id}), 202
+    return jsonify({"taskId": task.id, "endPoint": "https://" + task_name + ".crosschain.computer" }), 202
+
+
+@pokemon_blueprint.delete("/lagrange/space/<task_name>")
+def delete_task(task_name):
+    delete_space_task(task_name)
+
+    return jsonify({"space_name": task_name}), 202
+
+
+
