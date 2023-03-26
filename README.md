@@ -29,7 +29,7 @@ sudo apt install -y gunicorn
 ```
 
 ```shell
-gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
+gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()" --log-level=info
 ```
 
 Start a worker
