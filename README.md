@@ -17,7 +17,6 @@ Standard build process:
 
 Manual started Redis
 
-
 ```shell
  docker run -d --name computing_provider -p 6379:6379 redis/redis-stack-server:latest 
 ```

@@ -3,7 +3,7 @@ import logging
 from flask import Flask
 
 from computing_provider.api.celery_status import celery_task_status_blueprint
-from computing_provider.api.pokemon import pokemon_blueprint
+from computing_provider.api.lagrange_view import pokemon_blueprint
 from computing_provider.api.views import views_blueprint
 
 
