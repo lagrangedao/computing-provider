@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def config():
-    with open("config.toml", mode="rb") as fp:
+    with open("config/config.toml", mode="rb") as fp:
         sys_config = tomli.load(fp)
     return sys_config
 
