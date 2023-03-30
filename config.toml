@@ -1,0 +1,5 @@
+[main]
+api_url = "https://api.lagrangedao.org"
+computing_provider_name = "cp-test"
+multi_address = "/ip4/192.168.0.1/tcp/1347"
+lagrange_key = ""

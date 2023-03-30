@@ -9,3 +9,4 @@ redis==3.5.3
 kubernetes==25.3.0
 pytz
 eth-keys
+tomli
