@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from eth_keys import keys
+import hashlib
 
 
 def generate_node_id():
@@ -30,4 +31,16 @@ def generate_node_id():
     private_key = keys.PrivateKey(private_key_bytes)
     # Derive the node ID using the public key in hexadecimal format
     node_id = private_key.public_key.to_hex()
-    return node_id
+    peer_id = hash_public_key(private_key.public_key).hex()
+    return node_id, peer_id
+
+
+def hash_public_key(public_key) -> bytes:
+    # Convert the public key to bytes and hash it using SHA256
+    public_key_bytes = public_key.to_bytes()
+    hash_obj = hashlib.sha256()
+    hash_obj.update(public_key_bytes)
+    hash_digest = hash_obj.digest()
+
+    # Return the hash digest as the peer ID
+    return hash_digest
