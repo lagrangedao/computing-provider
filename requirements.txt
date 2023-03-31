@@ -10,3 +10,4 @@ kubernetes==25.3.0
 pytz
 eth-keys
 tomli
+libp2p

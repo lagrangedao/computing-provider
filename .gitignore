@@ -132,3 +132,6 @@ dmypy.json
 #remove local settings
 local-server.sh
 prod-server.sh
+
+#local config file
+config/config.toml
