@@ -17,7 +17,6 @@ Standard build process:
 
 Manual started Redis
 
-
 ```shell
  docker run -d --name computing_provider -p 6379:6379 redis/redis-stack-server:latest 
 ```
@@ -29,7 +28,7 @@ sudo apt install -y gunicorn
 ```
 
 ```shell
-gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()" --log-level=info
+gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
 ```
 
 Start a worker
