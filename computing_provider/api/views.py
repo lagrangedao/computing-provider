@@ -1,7 +1,4 @@
 import logging
-import os
-from pathlib import Path
-
 from flask import render_template, Blueprint, jsonify
 
 from computing_provider.api.node_service import generate_node_id
