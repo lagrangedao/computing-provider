@@ -1,51 +1,44 @@
 import logging
 
-from flask import Blueprint, jsonify
-from computing_provider.computing_worker.tasks.download_pokemon_sprite import (
-    download_pokemon_sprite_task,
-)
+from flask import Blueprint, jsonify, request
+
 from computing_provider.computing_worker.tasks.build_space import (
     build_space_task,
     delete_space_task,
 )
 
 logger = logging.getLogger(__name__)
-pokemon_blueprint = Blueprint("pokemon", __name__)
+lagrange_blueprint = Blueprint("lagrange", __name__)
 
 
-@pokemon_blueprint.get("/pokemon/<pokemon_name>")
-def download_pokemon_sprite(pokemon_name):
-    """
-    Goes out to the third-party PokeAPI and downloads a sprite
-
-    :param str pokemon_name: Name of the pokemon to download the sprite for
-    :return: Task Id working on sprite retrieval, 202 status code
-    """
-    task = download_pokemon_sprite_task.delay(pokemon_name)
-    logger.info(f"Celery task created! Task ID: {task!r}")
-
-    return jsonify({"taskId": task.id}), 202
+@lagrange_blueprint.post('/lagrange/jobs')
+def receive_job():
+    job_data = request.json
+    logging.info("Job received %s" % job_data)
+    # Process the job
+    result = process_job(job_data)
+    return jsonify(result), 200
 
 
-@pokemon_blueprint.get("/lagrange/space/<task_name>")
+def process_job(job_data):
+    # Here, you can implement your custom logic to process the job_data
+    # For demonstration purposes, we'll simply return the job_data as the result
+    return job_data
+
+
+@lagrange_blueprint.get("/lagrange/space/<task_name>")
 def build_space(task_name):
     """
-    Goes out to the third-party PokeAPI and downloads a sprite
-
-    :param str pokemon_name: Name of the pokemon to download the sprite for
-    :return: Task Id working on sprite retrieval, 202 status code
+    Goes out to the third-party Space API and downloads space
     """
     task = build_space_task.delay(task_name)
     logger.info(f"build spaces task task created! Task ID: {task!r}")
 
-    return jsonify({"taskId": task.id, "endPoint": "https://" + task_name + ".crosschain.computer" }), 202
+    return jsonify({"taskId": task.id, "endPoint": "https://" + task_name + ".crosschain.computer"}), 202
 
 
-@pokemon_blueprint.delete("/lagrange/space/<task_name>")
+@lagrange_blueprint.delete("/lagrange/space/<task_name>")
 def delete_task(task_name):
     delete_space_task(task_name)
 
     return jsonify({"space_name": task_name}), 202
-
-
-

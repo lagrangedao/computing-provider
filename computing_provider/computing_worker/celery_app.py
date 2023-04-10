@@ -4,7 +4,7 @@ from celery import Celery
 from kombu import Queue, Exchange
 
 from computing_provider.computing_worker import celeryconfig, boot
-from computing_provider.computing_worker.celeryconfig import DOWNLOAD_POKEMON_SPRITE_QUEUE, BUILD_SPACE_QUEUE
+from computing_provider.computing_worker.celeryconfig import  BUILD_SPACE_QUEUE
 
 # debug settings
 debug = eval(os.environ.get("DEBUG", "False"))
@@ -74,11 +74,6 @@ dictConfig({
 celery_app = Celery()
 celery_app.config_from_object(celeryconfig)
 celery_app.conf.task_queues = (
-    Queue(
-        name=DOWNLOAD_POKEMON_SPRITE_QUEUE,
-        exchange=Exchange(DOWNLOAD_POKEMON_SPRITE_QUEUE),
-        routing_key=DOWNLOAD_POKEMON_SPRITE_QUEUE,
-    ),
     Queue(
         name=BUILD_SPACE_QUEUE,
         exchange=Exchange(BUILD_SPACE_QUEUE),

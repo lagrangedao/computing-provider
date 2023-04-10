@@ -2,6 +2,7 @@ import logging
 import os
 
 import requests
+from celery import states
 from kubernetes import client, config
 
 from computing_provider.computing_worker.celery_app import celery_app
