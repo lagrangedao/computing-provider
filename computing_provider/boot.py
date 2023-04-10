@@ -22,7 +22,7 @@ def cp_register():
 
     logging.info("Node started: %s peer id: %s" % (node_id, peer_id))
     url = api_url + "/cp"
-    headersAuth = {
+    headers_auth = {
         'Authorization': 'Bearer ' + lagrange_key,
     }
     body = {
@@ -30,7 +30,7 @@ def cp_register():
         "node_id": node_id,
         "multi_address": multi_address
     }
-    response = requests.post(url, headers=headersAuth, data=body)
+    response = requests.post(url, headers=headers_auth, data=body)
 
     if not response.ok:
         logging.warning(f"Failed to update cp info.%s" % response.json())

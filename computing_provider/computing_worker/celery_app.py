@@ -3,7 +3,7 @@ from logging.config import dictConfig
 from celery import Celery
 from kombu import Queue, Exchange
 
-from computing_provider.computing_worker import celeryconfig, boot
+from computing_provider.computing_worker import celeryconfig
 from computing_provider.computing_worker.celeryconfig import  BUILD_SPACE_QUEUE
 
 # debug settings
@@ -80,5 +80,4 @@ celery_app.conf.task_queues = (
         routing_key=BUILD_SPACE_QUEUE,
     ),
 )
-boot.cp_register()
 
