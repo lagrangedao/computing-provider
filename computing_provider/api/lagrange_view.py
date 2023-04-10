@@ -8,16 +8,15 @@ from computing_provider.computing_worker.tasks.build_space import (
 )
 
 logger = logging.getLogger(__name__)
-pokemon_blueprint = Blueprint("pokemon", __name__)
+lagrange_blueprint = Blueprint("lagrange", __name__)
 
 
-@pokemon_blueprint.post('/lagrange/jobs')
+@lagrange_blueprint.post('/lagrange/jobs')
 def receive_job():
     job_data = request.json
     logging.info("Job received %s" % job_data)
     # Process the job
     result = process_job(job_data)
-
     return jsonify(result), 200
 
 
@@ -27,7 +26,7 @@ def process_job(job_data):
     return job_data
 
 
-@pokemon_blueprint.get("/lagrange/space/<task_name>")
+@lagrange_blueprint.get("/lagrange/space/<task_name>")
 def build_space(task_name):
     """
     Goes out to the third-party PokeAPI and downloads a sprite
@@ -41,7 +40,7 @@ def build_space(task_name):
     return jsonify({"taskId": task.id, "endPoint": "https://" + task_name + ".crosschain.computer"}), 202
 
 
-@pokemon_blueprint.delete("/lagrange/space/<task_name>")
+@lagrange_blueprint.delete("/lagrange/space/<task_name>")
 def delete_task(task_name):
     delete_space_task(task_name)
 
