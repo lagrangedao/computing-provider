@@ -20,7 +20,7 @@ services:
     volumes:
       - .:/computing_provider
     command: >
-      gunicorn -c "python:config.gunicorn" --reload "flask_celery_redis.app:create_app()"
+      gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
   celery_worker:
     build:
       context: "."
@@ -32,6 +32,6 @@ services:
     volumes:
       - .:/computing_provider
     command: >
-      celery --app flask_celery_redis.celery.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
+      celery --app computing_provider.computing_worker.celery_app worker --loglevel "${CELERY_LOG_LEVEL:-INFO}"
 volumes:
   redis: {}
