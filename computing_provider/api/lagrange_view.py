@@ -29,10 +29,7 @@ def process_job(job_data):
 @lagrange_blueprint.get("/lagrange/space/<task_name>")
 def build_space(task_name):
     """
-    Goes out to the third-party PokeAPI and downloads a sprite
-
-    :param str pokemon_name: Name of the pokemon to download the sprite for
-    :return: Task Id working on sprite retrieval, 202 status code
+    Goes out to the third-party Space API and downloads space
     """
     task = build_space_task.delay(task_name)
     logger.info(f"build spaces task task created! Task ID: {task!r}")
