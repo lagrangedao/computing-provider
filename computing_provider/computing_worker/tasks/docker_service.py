@@ -2,7 +2,7 @@
 An example which shows how to push images to a docker registry
 using the docker module.
 
-Before starting, you will need a `.env` file with the following:
+Before starting, you will need a `.env` storage with the following:
 
 OUR_DOCKER_USERNAME=Unknown
 OUR_DOCKER_PASSWORD=Unknown
@@ -18,7 +18,7 @@ import re
 import docker
 from dotenv import load_dotenv
 
-# Let's load the `.env` file.
+# Let's load the `.env` storage.
 
 
 log = logging.getLogger(__name__)

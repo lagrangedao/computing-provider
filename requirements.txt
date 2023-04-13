@@ -2,7 +2,7 @@ Flask-SQLAlchemy==2.5.1
 flask
 python-dotenv
 docker==6.0.1
-requests==2.28.2
+requests==2.28.1
 kombu
 celery
 redis==4.4.4
@@ -10,3 +10,4 @@ kubernetes==25.3.0
 pytz
 eth-keys
 tomli
+python-mcs-sdk==0.3.1
