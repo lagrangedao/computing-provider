@@ -1,4 +1,6 @@
 import logging
+import os
+from os import path
 
 from flask import Flask
 
@@ -30,7 +32,8 @@ def create_app():
 
     app.config.from_pyfile("settings.py", silent=True)
     app.jinja_env.auto_reload = True
-
+    from computing_provider.storage.view import storage_blueprint
     app.register_blueprint(celery_task_status_blueprint)
+    app.register_blueprint(storage_blueprint)
     cp_register()
     return app

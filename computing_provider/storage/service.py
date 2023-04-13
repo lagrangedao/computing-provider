@@ -1,12 +1,12 @@
+import json
 import logging
 import os
 import uuid
 from typing import Dict
 
-from swan_mcs import APIClient, BucketAPI
-from swan_mcs.object.bucket_storage import File
-
 from computing_provider.obj_model.job import Job
+from mcs import APIClient, BucketAPI
+from mcs.object.bucket_storage import File
 
 
 def upload_replace_file(file_path: str, bucket_name: str, dest_file_path: str) -> File:
@@ -31,7 +31,7 @@ def upload_replace_file(file_path: str, bucket_name: str, dest_file_path: str) -
 
 def create_job_from_job_detail(job_detail: Dict) -> Job:
     logging.info("create_job_from_job_detail")
-    job_uuid = job_detail.get('job_uuid')
+    uuid = job_detail.get('uuid')
     name = job_detail.get('name')
     status = job_detail.get('status')
     duration = job_detail.get('duration')
@@ -43,7 +43,7 @@ def create_job_from_job_detail(job_detail: Dict) -> Job:
     created_at = job_detail.get('created_at')
     updated_at = job_detail.get('updated_at', created_at)
 
-    job = Job(uuid=job_uuid, name=name, status=status, duration=duration, hardware=hardware,
+    job = Job(uuid=uuid, name=name, status=status, duration=duration, hardware=hardware,
               job_source_uri=job_source_uri, job_result_uri=job_result_uri, storage_source=storage_source,
               created_at=created_at, task_uuid=task_uuid, updated_at=updated_at)
 
@@ -53,14 +53,15 @@ def create_job_from_job_detail(job_detail: Dict) -> Job:
 def submit_job(job: Job) -> File:
     logging.info("Submitting job...")
     folder_path = "jobs"
-    job_detail_file_name = os.path.join(folder_path + str(uuid.uuid4()))
+    job_detail_file_name = os.path.join(folder_path, str(uuid.uuid4()))
     file_cache_path = os.getenv("FILE_CACHE_PATH")
-    os.makedirs(file_cache_path, exist_ok=True)
+    os.makedirs(os.path.join(file_cache_path, folder_path), exist_ok=True)
     task_detail_file_path = os.path.join(file_cache_path, job_detail_file_name)
 
     with open(task_detail_file_path, 'wb') as f:
         # Create the folder if it does not exist
         os.makedirs(folder_path, exist_ok=True)
+        f.write(json.dumps(job.to_dict()).encode('utf-8'))
 
     mcs_file: File = upload_replace_file(task_detail_file_path, os.getenv("MCS_BUCKET"), job_detail_file_name)
     logging.info("Job submitted %s" % mcs_file.to_json())

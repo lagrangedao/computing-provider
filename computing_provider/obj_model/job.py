@@ -23,7 +23,7 @@ class Job:
             "job_source_uri": self.job_source_uri,
             "job_result_uri": self.job_result_uri,
             "storage_source": self.storage_source,
-            "self.task_uuid":self.task_uuid,
+            "task_uuid":self.task_uuid,
             "created_at": self.created_at,
             "updated_at": self.updated_at
         }
