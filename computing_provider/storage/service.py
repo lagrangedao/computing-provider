@@ -1,9 +1,11 @@
 import json
 import logging
 import os
+import time
 import uuid
 from typing import Dict
 
+from computing_provider.constant import BIDDING_SUBMITTED
 from computing_provider.obj_model.job import Job
 from mcs import APIClient, BucketAPI
 from mcs.object.bucket_storage import File
@@ -41,7 +43,7 @@ def create_job_from_job_detail(job_detail: Dict) -> Job:
     storage_source = job_detail.get('storage_source')
     task_uuid = job_detail.get('task_uuid')
     created_at = job_detail.get('created_at')
-    updated_at = job_detail.get('updated_at', created_at)
+    updated_at = job_detail.get('updated_at')
 
     job = Job(uuid=uuid, name=name, status=status, duration=duration, hardware=hardware,
               job_source_uri=job_source_uri, job_result_uri=job_result_uri, storage_source=storage_source,
@@ -53,7 +55,7 @@ def create_job_from_job_detail(job_detail: Dict) -> Job:
 def submit_job(job: Job) -> File:
     logging.info("Submitting job...")
     folder_path = "jobs"
-    job_detail_file_name = os.path.join(folder_path, str(uuid.uuid4()))
+    job_detail_file_name = os.path.join(folder_path, str(uuid.uuid4()) + ".json")
     file_cache_path = os.getenv("FILE_CACHE_PATH")
     os.makedirs(os.path.join(file_cache_path, folder_path), exist_ok=True)
     task_detail_file_path = os.path.join(file_cache_path, job_detail_file_name)
@@ -61,9 +63,12 @@ def submit_job(job: Job) -> File:
     with open(task_detail_file_path, 'wb') as f:
         # Create the folder if it does not exist
         os.makedirs(folder_path, exist_ok=True)
+        job.status = BIDDING_SUBMITTED
+        job.updated_at = str(time.time())
         f.write(json.dumps(job.to_dict()).encode('utf-8'))
 
     mcs_file: File = upload_replace_file(task_detail_file_path, os.getenv("MCS_BUCKET"), job_detail_file_name)
-    logging.info("Job submitted %s" % mcs_file.to_json())
+    logging.info("Job submitted to IPFS %s" % mcs_file.to_json())
+
     job.job_result_uri = mcs_file.ipfs_url
     return mcs_file

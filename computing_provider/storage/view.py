@@ -23,7 +23,7 @@ storage_blueprint = Blueprint("storage", __name__)
 def receive_job():
     job_data = request.json
     logging.info("Job received %s" % job_data)
-    # Process the job
+    # TODO Async Processing the job
     result = process_job(job_data)
     return jsonify(result), 200
 
@@ -32,8 +32,9 @@ def process_job(job_data):
     # Here, you can implement your custom logic to process the job_data
     # For demonstration purposes, we'll simply return the job_data as the result
     job: Job = create_job_from_job_detail(job_data)
+    job.job_result_uri = "http://api.plos.org/search?q=title:DNA"
     mcs_file = submit_job(job)
-    job.job_result_uri = mcs_file.ipfs_url
+
     return job.to_dict()
 
 
