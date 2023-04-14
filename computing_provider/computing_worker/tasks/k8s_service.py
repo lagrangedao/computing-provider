@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import socket
+import logging
 from kubernetes import client, config
 
 
@@ -16,10 +17,10 @@ def list_all_pods():
     config.load_kube_config()
 
     v1 = client.CoreV1Api()
-    print("Listing pods with their IPs:")
+    logging.info("Listing pods with their IPs:")
     ret = v1.list_pod_for_all_namespaces(watch=False)
     for i in ret.items:
-        print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
+        logging.info("Pod id: %s, namespace: %s, pod name: %s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
 
 def create_deployment_object(container: Container, label: str):
@@ -65,18 +66,7 @@ def update_deployment(api, deployment, image: str, name: str):
     resp = api.patch_namespaced_deployment(
         name=name, namespace="default", body=deployment
     )
-    # TODO use logger
-    print("\n[INFO] deployment's container image updated.\n")
-    print("%s\t%s\t\t\t%s\t%s" % ("NAMESPACE", "NAME", "REVISION", "IMAGE"))
-    print(
-        "%s\t\t%s\t%s\t\t%s\n"
-        % (
-            resp.metadata.namespace,
-            resp.metadata.name,
-            resp.metadata.generation,
-            resp.spec.template.spec.containers[0].image,
-        )
-    )
+    logging.info("Deployment's container image updated. Deployment name: %s" % resp.metadata.name)
 
 
 def restart_deployment(api, deployment, name: str):
@@ -92,17 +82,7 @@ def restart_deployment(api, deployment, name: str):
     resp = api.patch_namespaced_deployment(
         name=name, namespace="default", body=deployment
     )
-    # TODO use logger
-    print("\n[INFO] deployment restarted.\n")
-    print("%s\t\t\t%s\t%s" % ("NAME", "REVISION", "RESTARTED-AT"))
-    print(
-        "%s\t%s\t\t%s\n"
-        % (
-            resp.metadata.name,
-            resp.metadata.generation,
-            resp.spec.template.metadata.annotations,
-        )
-    )
+    logging.info("Deployment restarted. Deployment name: %s" % resp.metadata.name)
 
 
 def create_service(api, port, label: str):
@@ -122,8 +102,7 @@ def create_service(api, port, label: str):
     # Creation of the Deployment in specified namespace
     # (Can replace "default" with a namespace you may have created)
     resp = api.create_namespaced_service(namespace="default", body=body)
-    # TODO use logger
-    print("\n[INFO] service created.")
+    logging.info("Service created")
 
 
 def create_ingress(api, port, label: str, host_name: str):
@@ -159,8 +138,7 @@ def create_ingress(api, port, label: str, host_name: str):
         namespace="default",
         body=body
     )
-    # TODO use logger
-    print("\n[INFO] ingress created.")
+    logging.info("Ingress created")
 
 
 def create_deployment(api, deployment):
@@ -168,20 +146,8 @@ def create_deployment(api, deployment):
     resp = api.create_namespaced_deployment(
         body=deployment, namespace="default"
     )
+    logging.info("Deployment created. Deployment name: %s" % resp.metadata.name)
 
-    # TODO use logger
-    print("\n[INFO] deployment created.\n")
-    print("%s\t%s\t\t\t%s\t%s\t%s" % ("NAMESPACE", "NAME", "REVISION", "IMAGE", 'PORTS'))
-    print(
-        "%s\t\t%s\t%s\t\t%s\t\t%s\n"
-        % (
-            resp.metadata.namespace,
-            resp.metadata.name,
-            resp.metadata.generation,
-            resp.spec.template.spec.containers[0].image,
-            resp.spec.template.spec.containers[0].ports,
-        )
-    )
 
 
 def delete_service(api, service_name: str):
@@ -193,8 +159,7 @@ def delete_service(api, service_name: str):
             propagation_policy="Foreground", grace_period_seconds=5
         ),
     )
-    # TODO use logger
-    print("\n[INFO] service deleted.")
+    logging.info("Service deleted")
 
 
 def delete_ingress(api, ingress_name: str):
@@ -206,8 +171,8 @@ def delete_ingress(api, ingress_name: str):
             propagation_policy="Foreground", grace_period_seconds=5
         ),
     )
-    #TODO use logger
-    print("\n[INFO] ingress deleted.")
+    logging.info("Ingress deleted")
+
 
 def delete_deployment(api, deployment_name: str):
     # Delete deployment
@@ -218,8 +183,7 @@ def delete_deployment(api, deployment_name: str):
             propagation_policy="Foreground", grace_period_seconds=5
         ),
     )
-    # TODO use logger
-    print("\n[INFO] deployment deleted.")
+    logging.info("Deployment deleted")
 
 
 def get_random_port():
