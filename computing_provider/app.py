@@ -1,9 +1,10 @@
 import logging
+import os
+from os import path
 
 from flask import Flask
 
 from computing_provider.api.celery_status import celery_task_status_blueprint
-from computing_provider.api.lagrange_view import lagrange_blueprint
 from computing_provider.boot import cp_register
 
 
@@ -31,8 +32,8 @@ def create_app():
 
     app.config.from_pyfile("settings.py", silent=True)
     app.jinja_env.auto_reload = True
-
+    from computing_provider.storage.view import storage_blueprint
     app.register_blueprint(celery_task_status_blueprint)
-    app.register_blueprint(lagrange_blueprint)
+    app.register_blueprint(storage_blueprint)
     cp_register()
     return app

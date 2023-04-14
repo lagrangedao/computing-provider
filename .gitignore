@@ -133,5 +133,5 @@ dmypy.json
 local-server.sh
 prod-server.sh
 
-#local config file
+#local config storage
 config/config.toml
