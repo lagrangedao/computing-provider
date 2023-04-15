@@ -29,12 +29,12 @@ def receive_job():
 
 
 def process_job(job_data):
-    # Here, you can implement your custom logic to process the job_data
-    # For demonstration purposes, we'll simply return the job_data as the result
-    job: Job = create_job_from_job_detail(job_data)
-    job.job_result_uri = "http://api.plos.org/search?q=title:DNA"
-    mcs_file = submit_job(job)
 
+    job: Job = create_job_from_job_detail(job_data)
+    space_name = job.job_source_uri.split('/')[-1]
+    task = build_space_task.delay(space_name)
+    job.job_result_uri = "https://" + space_name + ".crosschain.computer"
+    mcs_file = submit_job(job)
     return job.to_dict()
 
 

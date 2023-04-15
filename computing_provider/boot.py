@@ -28,7 +28,8 @@ def cp_register():
     body = {
         "name": name,
         "node_id": node_id,
-        "multi_address": multi_address
+        "multi_address": multi_address,
+        "autobid": 1
     }
     response = requests.post(url, headers=headers_auth, data=body)
 
