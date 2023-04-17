@@ -28,7 +28,7 @@ Standard build process:
 **computing provider**
 
 ```shell
-git clone 
+git clone https://github.com/lagrangedao/computing-provider
 cp .env_smaple .env
 ```
 for variables in the .env file
@@ -64,8 +64,19 @@ How to get lagrange_key
 Start the CP Node
 ```shell
 sudo apt install -y gunicorn
+pip install -r requirements.txt
 gunicorn -c "python:config.gunicorn" --reload "computing_provider.app:create_app()"
 ```
+You will see the following output if start properly:
+```shell
+[2023-04-17 00:28:09 -0400] [916988] [INFO] Starting gunicorn 20.1.0
+[2023-04-17 00:28:09 -0400] [916988] [INFO] Listening at: http://0.0.0.0:8000 (916988)
+[2023-04-17 00:28:09 -0400] [916988] [INFO] Using worker: sync
+[2023-04-17 00:28:09 -0400] [916989] [INFO] Booting worker with pid: 916989
+[2023-04-17 00:28:09,602] INFO in node_service: Found key in .swan_node/private_key
+[2023-04-17 00:28:09,604] INFO in boot: Node started: 0x601e25ab158ba1f7
+```
+
 
 Start a CP worker
 
