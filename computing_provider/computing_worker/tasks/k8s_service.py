@@ -15,12 +15,26 @@ class Container:
 
 def list_all_pods():
     config.load_kube_config()
-
     v1 = client.CoreV1Api()
     logging.info("Listing pods with their IPs:")
     ret = v1.list_pod_for_all_namespaces(watch=False)
     for i in ret.items:
         logging.info("Pod id: %s, namespace: %s, pod name: %s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
+
+
+def get_deployment(deployment_name: str):
+    config.load_kube_config()
+    api_client = client.AppsV1Api()
+    logging.info("Deployment name: %s" % deployment_name)
+    try:
+        # Get the deployment object by name
+        api_client.read_namespaced_deployment(name=deployment_name, namespace="default")
+        logging.info("Deployment {} exists.".format(deployment_name))
+        return True
+
+    except Exception:
+        logging.info("Deployment {} does not exist.".format(deployment_name))
+        return False
 
 
 def create_deployment_object(container: Container, label: str):
@@ -58,10 +72,7 @@ def create_deployment_object(container: Container, label: str):
     return deployment
 
 
-def update_deployment(api, deployment, image: str, name: str):
-    # Update container image
-    deployment.spec.template.spec.containers[0].image = image
-
+def update_deployment(api, deployment, name):
     # patch the deployment
     resp = api.patch_namespaced_deployment(
         name=name, namespace="default", body=deployment
