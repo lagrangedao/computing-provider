@@ -94,24 +94,20 @@ class Docker(object):
         elif "status" in response:
             logging.info("%s", response["status"])
 
-    def build(self, path, repository):
-
-        tag = "{}/{}".format(self.registry, repository)
-
+    def build(self, path, tag):
         output = self.api_client.build(path=path, tag=tag)
         self._process_output(output)
-        log.info("done building {}".format(repository))
+        log.info("done building {}".format(tag))
 
-    def push(self, repository):
-        tag = "{}/{}".format(self.registry, repository)
-        print(tag)
+    def push(self, repository, tag):
         publisher = self.api_client.push(repository=repository,
+                                         tag=tag,
                                          stream=True,
                                          decode=True, auth_config=self.get_credentials_from_env()
                                          )
         for response in publisher:
             self.log_response(response)
-        log.info("done pushing {}".format(tag))
+        log.info("done pushing {}".format(repository + ":" + tag))
 
     def _process_output(self, output):
         if type(output) == str:
@@ -175,8 +171,8 @@ if __name__ == "__main__":
     repository = 'nbaicloud/hello_world'
     registry = 'docker.io'
     docker_client = Docker(registry)
-    docker_client.build(path=IMAGE_PATH, repository=repository)
-    docker_client.push(repository)
+    docker_client.build(path=IMAGE_PATH, repository=repository, tag="latest")
+    docker_client.push(repository, "latest")
     container_id = docker_client.api_client.create_container(
         'busybox', 'ls', ports=[1111, 2222],
         host_config=docker_client.api_client.create_host_config(port_bindings={
