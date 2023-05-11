@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 storage_blueprint = Blueprint("storage", __name__)
 
 
-@storage_blueprint.post('/lagrange/jobs')
+@storage_blueprint.post('/api/v1/computing/lagrange/jobs')
 def receive_job():
     job_data = request.json
     logging.info("Job received %s" % job_data)
