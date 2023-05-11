@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import requests
+import re
 from celery import states
 from kubernetes import client, config
 
@@ -66,8 +67,24 @@ def build_space_task(self, space_name):
             docker_client.build(image_path, image)
             docker_client.push(repository, tag)
 
+            dockerfile_path = image_path + "/Dockerfile"
+            expose_pattern = r'^EXPOSE (\d+)$'
+            with open(dockerfile_path, 'r') as f:
+                dockerfile_content = f.read()
+
+            # Find the exposed port in the Dockerfile content
+            expose_match = re.search(expose_pattern, dockerfile_content, flags=re.MULTILINE)
+
+            if expose_match:
+                # Extract the port number from the match object
+                exposed_port = int(expose_match.group(1))
+                logger.info(f"The exposed port is {exposed_port}")
+                container_port = exposed_port
+            else:
+                container_port = 7860
+                logger.warning("No exposed port found in the Dockerfile, using default port 7680.")
+
             container_name = "computing-worker"
-            container_port = 7860
             host_port = get_random_port()
             host_name = space_name + ".crosschain.computer"
             container = Container(container_name, image, container_port, host_port)
