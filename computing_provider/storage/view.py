@@ -1,5 +1,5 @@
 import logging
-import os
+import tomli
 from os import path
 
 from flask import Blueprint, jsonify, request
@@ -34,8 +34,12 @@ def process_job(job_data):
     space_name = job.job_source_uri.split('/')[-1].lower()
     wallet_address = job.job_source_uri.split('/')[-2].lower()
     task = build_space_task.delay(space_name, wallet_address)
+
     app_name = f"{space_name}-{wallet_address}"
-    job.job_result_uri = f"https://{app_name}.crosschain.computer"
+    with open("config/config.toml", mode="rb") as fp:
+        sys_config = tomli.load(fp)
+    domain = sys_config.get("main")["domain_name"]
+    job.job_result_uri = f"https://{app_name}.{domain}"
 
     mcs_file = submit_job(job)
     return job.to_dict()
