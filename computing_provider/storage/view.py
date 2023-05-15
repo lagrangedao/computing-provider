@@ -32,8 +32,11 @@ def process_job(job_data):
 
     job: Job = create_job_from_job_detail(job_data)
     space_name = job.job_source_uri.split('/')[-1]
-    task = build_space_task.delay(space_name)
-    job.job_result_uri = "https://" + space_name + ".crosschain.computer"
+    wallet_address = job.job_source_uri.split('/')[-2]
+    task = build_space_task.delay(space_name, wallet_address)
+    app_name = f"{space_name}-{wallet_address}"
+    job.job_result_uri = f"https://{app_name}.crosschain.computer"
+
     mcs_file = submit_job(job)
     return job.to_dict()
 

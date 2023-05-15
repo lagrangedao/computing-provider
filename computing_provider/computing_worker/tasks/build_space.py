@@ -27,11 +27,11 @@ def delete_space_task(self, space_name):
 
 
 @celery_app.task(name=BUILD_SPACE_TASK, bind=True)
-def build_space_task(self, space_name):
+def build_space_task(self, space_name, wallet_address):
     logger.info(
-        f"Attempting to download spaces from Lagrange. spaces name:{space_name}"
+        f"Attempting to download spaces from Lagrange. spaces name and wallet: {space_name}, {wallet_address}"
     )
-    space_api_response = requests.get(f"http://api.lagrangedao.org/spaces/{space_name}")
+    space_api_response = requests.get(f"http://api.lagrangedao.org/spaces/{wallet_address}/{space_name}")
     logger.info(f"Space API response received. Response: {space_api_response.status_code}")
 
     if not space_api_response.ok:
@@ -43,6 +43,7 @@ def build_space_task(self, space_name):
         )
         raise Exception("Space not found!")
 
+    space_name = f"{space_name}-{wallet_address}"
     space_json = space_api_response.json()
     files = space_json['data']['files']
     build_folder = 'computing_provider/static/build/'
