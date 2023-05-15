@@ -46,7 +46,7 @@ def build_space_task(self, space_name, wallet_address):
         )
         raise Exception("Space not found!")
 
-    space_name = f"{space_name}-{wallet_address}"
+    space_name = f"{space_name.lower()}-{wallet_address.lower()}"
     space_json = space_api_response.json()
     files = space_json['data']['files']
     build_folder = 'computing_provider/static/build/'
