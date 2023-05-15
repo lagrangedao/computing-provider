@@ -9,7 +9,7 @@ from kubernetes import client, config
 from computing_provider.computing_worker.celery_app import celery_app
 from computing_provider.computing_worker.tasks.docker_service import Docker
 from computing_provider.computing_worker.tasks.k8s_service import *
-
+from computing_provider.boot import config
 
 logger = logging.getLogger(__name__)
 BUILD_SPACE_TASK = "build_space_task"
@@ -31,7 +31,9 @@ def build_space_task(self, space_name, wallet_address):
     logger.info(
         f"Attempting to download spaces from Lagrange. spaces name and wallet: {space_name}, {wallet_address}"
     )
-    space_api_response = requests.get(f"http://api.lagrangedao.org/spaces/{wallet_address}/{space_name}")
+    cfg = config()
+    api_url = cfg.get("main")["api_url"]
+    space_api_response = requests.get(f"{api_url}/spaces/{wallet_address}/{space_name}")
     logger.info(f"Space API response received. Response: {space_api_response.status_code}")
 
     if not space_api_response.ok:

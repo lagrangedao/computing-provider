@@ -31,8 +31,8 @@ def receive_job():
 def process_job(job_data):
 
     job: Job = create_job_from_job_detail(job_data)
-    space_name = job.job_source_uri.split('/')[-1]
-    wallet_address = job.job_source_uri.split('/')[-2]
+    space_name = job.job_source_uri.split('/')[-1].lower()
+    wallet_address = job.job_source_uri.split('/')[-2].lower()
     task = build_space_task.delay(space_name, wallet_address)
     app_name = f"{space_name}-{wallet_address}"
     job.job_result_uri = f"https://{app_name}.crosschain.computer"
