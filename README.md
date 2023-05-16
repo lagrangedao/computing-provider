@@ -55,6 +55,7 @@ api_url = "https://api.lagrangedao.org"
 computing_provider_name = <Your computing provider name>
 multi_address = "/ip4/<Your public ip>/tcp/<your port>"
 lagrange_key = "xxxxx" <Check the document below for how to get it>
+domain_name = <domain name for job result uri>
 ```
 
 How to get lagrange_key
