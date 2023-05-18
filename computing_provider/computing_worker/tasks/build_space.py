@@ -46,7 +46,6 @@ def build_space_task(self, space_name, wallet_address):
         )
         raise Exception("Space not found!")
 
-    space_name = f"{space_name.lower()}-{wallet_address.lower()}"
     space_json = space_api_response.json()
     files = space_json['data']['files']
     build_folder = 'computing_provider/static/build/'
@@ -61,6 +60,9 @@ def build_space_task(self, space_name, wallet_address):
                 logger.info("Download %s successfully." % space_name)
 
             image_path = os.path.join(build_folder, download_space_path, space_name)
+
+            #space name should be unique (with wallet id) from now on
+            space_name = f"{space_name.lower()}-{wallet_address.lower()}"
             repository = 'nebulablock/' + space_name
             registry = 'docker.io'
             # use timestamp as image tag
