@@ -59,7 +59,8 @@ def cp_register():
         "name": name,
         "node_id": node_id,
         "multi_address": multi_address,
-        "autobid": 1
+        "autobid": 1,
+        "score": 0
     }
     response = requests.post(url, headers=headers, data=json.dumps(body))
 
