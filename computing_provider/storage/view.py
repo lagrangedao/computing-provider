@@ -61,3 +61,9 @@ def delete_task(task_name):
     delete_space_task(task_name)
 
     return jsonify({"space_name": task_name}), 202
+
+@storage_blueprint.get("/")
+def ping():
+    #TODO send back more info about the provider in the request. For now this is all we really need
+    return jsonify({"status": "success"}), 200
+        
