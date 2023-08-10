@@ -7,8 +7,8 @@ from typing import Dict
 
 from computing_provider.constant import BIDDING_SUBMITTED
 from computing_provider.obj_model.job import Job
-from mcs import APIClient, BucketAPI
-from mcs.object.bucket_storage import File
+from swan_mcs import APIClient, BucketAPI
+from swan_mcs.object.bucket_storage import File
 
 
 def upload_replace_file(file_path: str, bucket_name: str, dest_file_path: str) -> File:
